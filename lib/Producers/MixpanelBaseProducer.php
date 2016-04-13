@@ -21,6 +21,12 @@ abstract class Producers_MixpanelBaseProducer extends Base_MixpanelBase {
 
 
     /**
+     * @var string an api key associated to a Mixpanel project
+     */
+    protected $_apiKey;
+
+
+    /**
      * @var array a queue to hold messages in memory before flushing in batches
      */
     private $_queue = array();
@@ -52,10 +58,11 @@ abstract class Producers_MixpanelBaseProducer extends Base_MixpanelBase {
     /**
      * Creates a new MixpanelBaseProducer, assings Mixpanel project token, registers custom Consumers, and instantiates
      * the desired consumer
-     * @param $token
-     * @param array $options
+     * @param array  $token
+     * @param string $apiKey
+     * @param array  $options
      */
-    public function __construct($token, $options = array()) {
+    public function __construct($token, $apiKey, $options = array()) {
 
         parent::__construct($options);
 
@@ -72,8 +79,12 @@ abstract class Producers_MixpanelBaseProducer extends Base_MixpanelBase {
         // associate token
         $this->_token = $token;
 
+        // associate Api Key
+        $this->_apiKey = $apiKey;
+
         if ($this->_debug()) {
             $this->_log("Using token: ".$this->_token);
+            $this->_log("Using api key: ".$this->_apiKey);
         }
 
         // instantiate the chosen consumer
@@ -159,6 +170,16 @@ abstract class Producers_MixpanelBaseProducer extends Base_MixpanelBase {
      */
     public function getToken() {
         return $this->_token;
+    }
+
+
+    /**
+     * Returns the current Mixpanel project api key
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->_apiKey;
     }
 
 

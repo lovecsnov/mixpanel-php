@@ -3,6 +3,7 @@
 require_once(dirname(__FILE__) . "/Base/MixpanelBase.php");
 require_once(dirname(__FILE__) . "/Producers/MixpanelPeople.php");
 require_once(dirname(__FILE__) . "/Producers/MixpanelEvents.php");
+require_once(dirname(__FILE__) . "/Producers/MixpanelEventsImporter.php");
 
 /**
  * This is the main class for the Mixpanel PHP Library which provides all of the methods you need to track events and
@@ -128,29 +129,32 @@ class Mixpanel extends Base_MixpanelBase {
      * @var Mixpanel
      */
     private static $_instance;
-    
+
 
     /**
      * Instantiates a new Mixpanel instance.
-     * @param $token
-     * @param array $options
+     * @param array  $token
+     * @param string $apiKey
+     * @param array  $options
      */
-    public function __construct($token, $options = array()) {
+    public function __construct($token, $apiKey, $options = array()) {
         parent::__construct($options);
         $this->people = new Producers_MixpanelPeople($token, $options);
         $this->_events = new Producers_MixpanelEvents($token, $options);
+        $this->_imported_events = new Producers_MixpanelEventsImporter($token, $apiKey, $options);
     }
 
 
     /**
      * Returns a singleton instance of Mixpanel
-     * @param $token
+     * @param       $token
+     * @param       $apiKey
      * @param array $options
      * @return Mixpanel
      */
-    public static function getInstance($token, $options = array()) {
+    public static function getInstance($token, $apiKey, $options = array()) {
         if(!isset(self::$_instance)) {
-            self::$_instance = new Mixpanel($token, $options);
+            self::$_instance = new Mixpanel($token, $apiKey, $options);
         }
         return self::$_instance;
     }
@@ -206,6 +210,16 @@ class Mixpanel extends Base_MixpanelBase {
      */
     public function track($event, $properties = array()) {
         $this->_events->track($event, $properties);
+    }
+
+    /**
+     * Import an event older than 5 days
+     * @param string $event
+     * @param array  $properties
+     */
+    public function import($event, $properties = array())
+    {
+        $this->_imported_events->import($event, $properties);
     }
 
 
